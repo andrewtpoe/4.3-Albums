@@ -2,7 +2,7 @@ require 'test_helper'
 
 class AlbumTest < ActiveSupport::TestCase
 
-  test "Ideal conditions are valid" do
+  test "Ideal conditions work as expected" do
     a = Album.new(title: 'test_title', genre: 'test_genre', artist: 'test_artist', length: 100)
     assert a.valid?
   end
@@ -10,47 +10,55 @@ class AlbumTest < ActiveSupport::TestCase
   test "Valid record can be saved and retrieved" do
     Album.create!(title: 'test_title', genre: 'test_genre', artist: 'test_artist', length: 100)
     record = Album.find_by(title: 'test_title')
-    assert record
+    assert record.present?
   end
 
-  test "Title must be present" do
-    a = Album.new(genre: 'test_genre', artist: 'test_artist', length: 100)
+  test "Title can not be blank" do
+    a = Album.new(title: '', genre: 'test_genre', artist: 'test_artist', length: 100)
     refute a.valid?
+    assert a.errors.keys.include?(:title)
   end
 
-  test "Genre must be present" do
-    a = Album.new(title: 'test_title', artist: 'test_artist', length: 100)
+  test "Genre can not be blank" do
+    a = Album.new(title: 'test_title', genre: '', artist: 'test_artist', length: 100)
     refute a.valid?
+    assert a.errors.keys.include?(:genre)
   end
 
-  test "Artist must be present" do
-    a = Album.new(title: 'test_title', genre: 'test_genre', length: 100)
+  test "Artist can not be blank" do
+    a = Album.new(title: 'test_title', genre: 'test_genre', artist: '', length: 100)
     refute a.valid?
+    assert a.errors.keys.include?(:artist)
   end
 
-  test "Length must be present" do
-    a = Album.new(title: 'test_title', genre: 'test_genre', artist: 'test_artist')
+  test "Length can not be blank" do
+    a = Album.new(title: 'test_title', genre: 'test_genre', artist: 'test_artist', length: nil)
     refute a.valid?
+    assert a.errors.keys.include?(:length)
   end
 
   test "Title can not have length of zero" do
     a = Album.new(title: '', genre: 'test_genre', artist: 'test_artist', length: 100)
     refute a.valid?
+    assert a.errors.keys.include?(:title)
   end
 
   test "Genre can not have length of zero" do
     a = Album.new(title: 'test_title', genre: '', artist: 'test_artist', length: 100)
     refute a.valid?
+    assert a.errors.keys.include?(:genre)
   end
 
   test "Artist can not have length of zero" do
     a = Album.new(title: 'test_title', genre: 'test_genre', artist: '', length: 100)
     refute a.valid?
+    assert a.errors.keys.include?(:artist)
   end
 
   test "Length must be an integer" do
     a = Album.new(title: 'test_title', genre: 'test_genre', artist: 'test_artist', length: 'fff')
     refute a.valid?
+    assert a.errors.keys.include?(:length)
   end
 
   test "Artist & Song can not be duplicated" do
